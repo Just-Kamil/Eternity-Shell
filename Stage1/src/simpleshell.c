@@ -31,47 +31,30 @@ int main(int argc, char *argv[])
     //if anything inputed
     if (args[0]) {
       
-
-      // get the arguments 
-        // reset pointer
-        arg = args;
-
-        // adjust for command
-        *arg++;
-
-        // aggregate all the arguments
-        char* catArgs = calloc(strlen(*arg), sizeof(char));
-
-
-        while(*arg != NULL) {
-          catArgs = realloc(catArgs, sizeof(char) * strlen(catArgs) + sizeof(char) * strlen(*arg));
-          // strcat(catArgs, *arg++);
-          sprintf(catArgs,"%s %s", catArgs, *arg++);
-        }
-
+      char* catArgs = serialiseArgument(args);
 
       /* COMMANDS AND STUFF */
-
 
       // clear
       if (!strcmp(args[0], "clr")) {clr(); continue;}
 
+      // exit
       if (!strcmp(args[0], "exit")) {exit(0);}
 
-      if (!strcmp(args[0], "dir")) {
-        dir(catArgs);
-        free(catArgs);
-        continue;
+      // dir
+      if (!strcmp(args[0], "dir")) {dir(catArgs); free(catArgs); continue;}
 
-      }
 
+      // if not explicitly stated
       arg = args;
       while (*arg) {
         fprintf(stdout, "%s ", *arg++);
         fputs("\n", stdout);
       }
 
-    }
+      /* END OF COMMANDS */
+
+    } // END OF COMMAND CHECK
 
   }
 
