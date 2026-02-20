@@ -31,12 +31,8 @@ int main(int argc, char *argv[])
     //if anything inputed
     if (args[0]) {
       
-      // clear
-      if (!strcmp(args[0], "clr")) {clr(); continue;}
 
-      if (!strcmp(args[0], "exit")) {exit(0);}
-
-      if (!strcmp(args[0], "dir")) {
+      // get the arguments 
         // reset pointer
         arg = args;
 
@@ -52,6 +48,17 @@ int main(int argc, char *argv[])
           // strcat(catArgs, *arg++);
           sprintf(catArgs,"%s %s", catArgs, *arg++);
         }
+
+
+      /* COMMANDS AND STUFF */
+
+
+      // clear
+      if (!strcmp(args[0], "clr")) {clr(); continue;}
+
+      if (!strcmp(args[0], "exit")) {exit(0);}
+
+      if (!strcmp(args[0], "dir")) {
         dir(catArgs);
         free(catArgs);
         continue;
