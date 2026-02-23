@@ -5,7 +5,11 @@
 
 int clr();
 int dir(char* args);
-int getEnviron();
+int environGet();
+int echo(char* arguments);
+
 char* serialiseArgument(char** args);
+int setEnvironShell(char* programArg);
+
 
 #endif // UTILITY_H_

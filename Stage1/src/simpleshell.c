@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <setjmp.h>
+
 #include "utility.h"
 
 // this was a typo, however it is so funny to me that I'm keeping it
@@ -14,6 +16,11 @@ int main(int argc, char *argv[])
   char * args[MAX_ARGS];
   char ** arg;
   char * prompt = "֍ ⇝ ";
+  char* shellShort = "etsh";
+
+
+  // change shell envVar
+  setEnvironShell(argv[0]);
   
   while (!feof(stdin)) {
 
@@ -28,12 +35,12 @@ int main(int argc, char *argv[])
     while ((*arg++ = strtok(NULL,SEPARATORS)));
 
 
-    //if anything inputed
+    //if anything inputted
     if (args[0]) {
       
       char* catArgs = serialiseArgument(args);
 
-      /* COMMANDS AND STUFF */
+      /* COMMANDS */
 
       // clear
       if (!strcmp(args[0], "clr")) {clr(); continue;}
@@ -44,13 +51,15 @@ int main(int argc, char *argv[])
       // dir
       if (!strcmp(args[0], "dir")) {dir(catArgs); free(catArgs); continue;}
 
+      // echo
+      if (!strcmp(args[0], "echo")){echo(catArgs); free(catArgs); continue;}
+
+      // environ
+      if (!strcmp(args[0], "environ")) {environGet(); continue;}
+
 
       // if not explicitly stated
-      arg = args;
-      while (*arg) {
-        fprintf(stdout, "%s ", *arg++);
-        fputs("\n", stdout);
-      }
+      printf("%s: %s, Command Not Found.\n", shellShort, args[0]);
 
       /* END OF COMMANDS */
 
