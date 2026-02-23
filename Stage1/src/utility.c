@@ -2,11 +2,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <errno.h>
 #include <linux/limits.h>
 
 #include "utility.h"
 extern char **environ;
-
+char cwd[PATH_MAX];
 
 
 
@@ -64,7 +65,80 @@ int environGet() {
 }
 
 int cd(char* arguments) {
-  return 0;
+
+  // cwd is set from setting the env variable earlier
+  // if the argument is empty, print current directory
+  if (!strlen(arguments)) {printf("%s\n", cwd); return 0;}
+
+  arguments++;
+
+  // have to move one to ignore the leading empty char
+  int res = chdir(arguments);
+
+
+  if (res == 0) {
+
+    // set env var of PWD to new dir
+    getcwd(cwd, sizeof(cwd));
+    char* envPre = "PWD=";
+
+    // allocate mem
+    char* envVar = calloc(strlen(envPre) + strlen(cwd), sizeof(char));
+
+    // join strings
+    envVar = strcat(envVar, envPre);
+    envVar = strcat(envVar, cwd);
+    
+    // set var
+    putenv(envVar);
+
+    return 0;
+  } else { // some error occurred
+    switch (errno)
+    {
+    case EACCES:
+      // no perms lmao lol rofl
+      printf("cd: You do not have the permission to change into this dir\n");
+      break;
+    case EFAULT:
+      // something im sure
+      // https://linux.die.net/man/2/chdir
+      printf("path points outside your accessible address space. cd: you sure done did something wrong :)\n");
+      break;
+    case EIO:
+      // I/O error somehow
+      printf("cd: your input was invalid\n");
+      break;
+
+    case ELOOP:
+      // too many symlinks, estoy loopin
+      printf("cd: too many symlinks when trying to resolve the path\n");
+      break;
+
+    case ENAMETOOLONG:
+      // somehow the path name was too long, impressive really
+      printf("cd: the path name was too long, somehow\n");
+      break;
+    
+    case ENOENT:
+      // file (dir) ain't real
+      printf("cd: directory does not exist\n");
+      break;
+    
+    case ENOTDIR:
+      // tried to cd into a file (laugh at this user)
+      printf("cd: path to file, not a directory\n");
+      break;
+
+    }
+    return 0;
+  }
+
+
+
+
+
+
 }
 
 int help() {
@@ -122,7 +196,6 @@ int setEnvironShell(char* programArg) {
   // build the string
 
   // the current directory as a string
-  char cwd[PATH_MAX];
   getcwd(cwd, sizeof(cwd));
 
   // prefix for putenv
@@ -131,7 +204,7 @@ int setEnvironShell(char* programArg) {
   // i hate this
   // WHY IS IT AN INT????? WHY? THERE IS LITERALLY A CHAR TYPE IN C, JUST USE THAT
   
-  // name of the shell (fr this time)
+  // name of the shell 
   char* progName = strrchr(programArg, 47);
 
   // allocate enough memory for the final string

@@ -52,7 +52,10 @@ int main(int argc, char *argv[])
       if (!strcmp(args[0], "dir")) {dir(catArgs); free(catArgs); continue;}
 
       // echo
-      if (!strcmp(args[0], "echo")){echo(catArgs); free(catArgs); continue;}
+      if (!strcmp(args[0], "echo")) {echo(catArgs); free(catArgs); continue;}
+
+      // cd
+      if (!strcmp(args[0], "cd")) {cd(catArgs); free(catArgs); continue;}
 
       // environ
       if (!strcmp(args[0], "environ")) {environGet(); continue;}
