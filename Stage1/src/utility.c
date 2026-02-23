@@ -97,13 +97,13 @@ int cd(char* arguments) {
     switch (errno)
     {
     case EACCES:
-      // no perms lmao lol rofl
+      // no perms 
       printf("cd: You do not have the permission to change into this dir\n");
       break;
     case EFAULT:
       // something im sure
       // https://linux.die.net/man/2/chdir
-      printf("path points outside your accessible address space. cd: you sure done did something wrong :)\n");
+      printf("cd: path points outside your accessible address space.\n");
       break;
     case EIO:
       // I/O error somehow
@@ -111,12 +111,12 @@ int cd(char* arguments) {
       break;
 
     case ELOOP:
-      // too many symlinks, estoy loopin
+      // too many symlinks
       printf("cd: too many symlinks when trying to resolve the path\n");
       break;
 
     case ENAMETOOLONG:
-      // somehow the path name was too long, impressive really
+      // the path name was too long
       printf("cd: the path name was too long, somehow\n");
       break;
     
@@ -126,7 +126,7 @@ int cd(char* arguments) {
       break;
     
     case ENOTDIR:
-      // tried to cd into a file (laugh at this user)
+      // tried to cd into a file
       printf("cd: path to file, not a directory\n");
       break;
 
