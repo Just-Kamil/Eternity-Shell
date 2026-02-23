@@ -13,7 +13,8 @@ char cwd[PATH_MAX];
 
 // COMMANDS //
 
-/// calls the system clear command
+/// @brief calls the system clear command
+/// @return 0 when completed
 int clr() {
   system("clear");
   // returning 0 here to show that the program completed successfully
@@ -57,22 +58,26 @@ int echo(char* arguments) {
   return 0;
 }
 
-
+/// @brief prints line by line each argument in environ
+/// @return 0 when completed
 int environGet() {
   char** envHead = environ;
   while (*envHead != NULL) {printf("%s\n", *envHead); *envHead++;}
   return 0;
 }
 
+/// @brief Changes directory to path given, otherwise prints current directory
+/// @param arguments path to a directory
+/// @return 0 if no errors, otherwise returns error code
 int cd(char* arguments) {
 
   // cwd is set from setting the env variable earlier
   // if the argument is empty, print current directory
   if (!strlen(arguments)) {printf("%s\n", cwd); return 0;}
 
+  // have to move one to ignore the leading empty char
   arguments++;
 
-  // have to move one to ignore the leading empty char
   int res = chdir(arguments);
 
 
@@ -99,46 +104,41 @@ int cd(char* arguments) {
     case EACCES:
       // no perms 
       printf("cd: You do not have the permission to change into this dir\n");
-      break;
+      return EACCES;
     case EFAULT:
       // something im sure
       // https://linux.die.net/man/2/chdir
       printf("cd: path points outside your accessible address space.\n");
-      break;
+      return EFAULT;
     case EIO:
       // I/O error somehow
       printf("cd: your input was invalid\n");
-      break;
+      return EIO;
 
     case ELOOP:
       // too many symlinks
       printf("cd: too many symlinks when trying to resolve the path\n");
-      break;
+      return ELOOP;
 
     case ENAMETOOLONG:
       // the path name was too long
       printf("cd: the path name was too long, somehow\n");
-      break;
+      return ENAMETOOLONG;
     
     case ENOENT:
       // file (dir) ain't real
       printf("cd: directory does not exist\n");
-      break;
+      return ENOENT;
     
     case ENOTDIR:
       // tried to cd into a file
       printf("cd: path to file, not a directory\n");
-      break;
+      return ENOTDIR;
 
     }
-    return 0;
   }
-
-
-
-
-
-
+  // im sure there is a chance someone somehow ends up here
+  return 0;
 }
 
 int help() {
@@ -154,15 +154,9 @@ int pause() {
 
 // SIMPLESHELL.C UTILS //
 
-
-// you can tell I'm taking this seriously because I looked up the doxygen style guide
-/*
-* Returns a concatenated version of arguments for use in passing to commands
-*
-* @param args an array of strings
-* 
-* @return a string of all passed strings with spaces separating them
-*/
+/// @brief Returns a concatenated version of arguments to be passed to commands
+/// @param args an array of strings
+/// @return a string of all passed arguments with spaces separating them
 char* serialiseArgument(char** args) {
 
         // reset pointer
@@ -178,9 +172,9 @@ char* serialiseArgument(char** args) {
         // aggregate all the arguments
         char* catArgs = calloc(strlen(*arg), sizeof(char));
 
+        // reallocate memory and concatenate the string until the args run out
         while(*arg != NULL) {
           catArgs = realloc(catArgs, sizeof(char) * strlen(catArgs) + sizeof(char) * strlen(*arg));
-          // strcat(catArgs, *arg++);
           sprintf(catArgs,"%s %s", catArgs, *arg++);
         }
       
