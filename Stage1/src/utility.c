@@ -1,3 +1,4 @@
+#include <termios.h>
 #include "utility.h"
 extern char **environ;
 
@@ -138,7 +139,36 @@ int help() {
   return 0;
 }
 
-int pause() {
+/// @brief Pauses the program until ENTER is inputted
+/// @return 0 upon completion
+int sysPause() {
+  // disabling buffer from here
+  // https://shtrom.ssji.net/skb/getc.html
+
+
+  // declare two variables
+  // one to store the old terminal settings
+  // one to set the new ones
+  struct termios old_tio, new_tio;
+
+  // get the current terminal settings into the addr of old_tio
+  tcgetattr(STDIN_FILENO, &old_tio);
+
+  // copy all the settings to the new variable
+  new_tio = old_tio;
+
+  // basically flip the bit flags that determine if the terminal has ICANON and ECHO
+  // the two flags that are responsible for printing typed text onto the terminal
+  new_tio.c_lflag &=(~ICANON & ~ECHO);
+
+  // apply changes to the terminal
+  tcsetattr(STDIN_FILENO, TCSANOW, &new_tio);
+
+  // for for enter to be inputted
+  while (getchar() != 10);
+
+  // restore old settings
+  tcsetattr(STDIN_FILENO, TCSANOW, &old_tio);
   return 0;
 }
 
@@ -198,7 +228,7 @@ int setEnvironShell(char* programArg) {
   char* progName = strrchr(programArg, 47);
 
   // allocate enough memory for the final string
-  char* finalExport = calloc(strlen(cwd) + strlen(expArg) + strlen(progName), sizeof(char));
+  char* finalExport = calloc(strlen(cwd) + strlen(expArg) + strlen(progName) + 3, sizeof(char));
 
   // concatenate the strings
   finalExport = strcat(finalExport, expArg);

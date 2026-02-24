@@ -15,6 +15,7 @@ int fileProcessor(char* fileName);
 // TODO
 // [x] make batch mode
 // [ ] make manual
+// [ ] make makefile
 // [ ] implement help
 // [ ] implement pause
 // [x] add the cwd to the prompt
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]){
   
   while (!feof(stdin)) {
 
-    printf("\x1b[37m\x1b[42m%s\x1b[0m\n", cwd);
+    printf("\x1b[37m\x1b[42m %s \x1b[0m\n", cwd);
     fputs(prompt, stdout);
 
     // get arguments and tokenise
@@ -76,7 +77,7 @@ int main(int argc, char *argv[]){
 
     // check if there was a continue flag set
     if (retFlag == 3)
-          continue; // END OF COMMAND CHECK
+          continue; 
   }
 
   return 0;
@@ -163,6 +164,16 @@ void commandParser(char *args[64], int* retFlag){
                   {*retFlag = 3; return;}
             }
 
+            // pause
+            if (!strcmp(args[0], "pause"))
+            {
+                  sysPause();
+                  {
+                        *retFlag = 3;
+                        return;
+                  };
+            }
+
             // if not explicitly stated
             printf("%s: %s, Command Not Found.\n", shellShort, args[0]);
 
@@ -200,6 +211,7 @@ int fileProcessor(char *fileName){
       if (retFlag == 3) {continue;}
     }
     
+    // close the file
     fclose(fptr);
 
     return 0;

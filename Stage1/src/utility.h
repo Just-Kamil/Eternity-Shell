@@ -11,6 +11,7 @@
 
 int clr();
 int environGet();
+int sysPause();
 int cd(char* arguments);
 int dir(char* arguments);
 int echo(char* arguments);
