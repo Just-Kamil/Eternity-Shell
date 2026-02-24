@@ -1,9 +1,3 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <linux/limits.h>
-
 #include "utility.h"
 
 // this was a typo, however it is so funny to me that I'm keeping it
@@ -12,33 +6,52 @@
 #define SEPARATORS " \t\n"
 
 
+// char cwd[PATH_MAX];
+char* shellShort = "etsh";
+void commandParser(char *args[64], int* retFlag);
+int fileProcessor(char* fileName);
+
+
 // TODO
-// [ ] make the while loop check whether or not it's in batch mode
+// [x] make batch mode
 // [ ] make manual
-// [ ] make batch mode
 // [ ] implement help
 // [ ] implement pause
 // [x] add the cwd to the prompt
 
 // *SPECIAL* TODO
-//  [ ] make .etshrc functionality
+//  [x] make .etshrc functionality
 //  [x] funny colours
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
   char buf[MAX_BUBBER];
   char * args[MAX_ARGS];
   char ** arg;
   char * prompt = "\x1b[42m↳\x1b[0m\x1b[32m\x1b[1m֍ ⇝ \x1b[0m";
-  char* shellShort = "etsh";
+  extern char cwd[PATH_MAX];
 
-  char cwd[PATH_MAX];
   getcwd(cwd, sizeof(cwd));
 
 
+  // sets batch mode
+  if (argv[1] != NULL) {
+      // tries to run a batch file
+      if(fileProcessor(argv[1]) == -1) {
+            printf("Invalid Script File");
+            // if it doesn't work return the program with an errored state
+            return -1;
+      } else {
+            return 0;
+      }
+  }
+
   // change shell envVar
   setEnvironShell(argv[0]);
+
+  // execute a .etshrc if one exists in the running dir
+  fileProcessor(".etshrc");
+
   
   while (!feof(stdin)) {
 
@@ -53,42 +66,141 @@ int main(int argc, char *argv[])
 
     while ((*arg++ = strtok(NULL,SEPARATORS)));
 
+    // if anything inputted
 
-    //if anything inputted
-    if (args[0]) {
-      
-      char* catArgs = serialiseArgument(args);
+    // have a way to continue when needed
+    int retFlag;
 
-      /* COMMANDS */
+    // process the command
+    commandParser(args, &retFlag);
 
-      // clear
-      if (!strcmp(args[0], "clr")) {clr(); continue;}
-
-      // exit
-      if (!strcmp(args[0], "exit")) {exit(0);}
-
-      // dir
-      if (!strcmp(args[0], "dir")) {dir(catArgs); free(catArgs); continue;}
-
-      // echo
-      if (!strcmp(args[0], "echo")) {echo(catArgs); free(catArgs); continue;}
-
-      // cd
-      if (!strcmp(args[0], "cd")) {cd(catArgs); getcwd(cwd, sizeof(cwd)); free(catArgs); continue;}
-
-      // environ
-      if (!strcmp(args[0], "environ")) {environGet(); continue;}
-
-
-      // if not explicitly stated
-      printf("%s: %s, Command Not Found.\n", shellShort, args[0]);
-
-      /* END OF COMMANDS */
-
-    } // END OF COMMAND CHECK
-
+    // check if there was a continue flag set
+    if (retFlag == 3)
+          continue; // END OF COMMAND CHECK
   }
 
-
   return 0;
+}
+
+/// @brief Takes in arguments as an array of strings and executes commands based on the input
+/// @param args an array of string arguments, with the first being the command name
+/// @param retFlag flag that allows continue to be run after a command is executed
+void commandParser(char *args[64], int* retFlag){
+      *retFlag = 1;
+      if (args[0])
+      {
+
+            char *catArgs = serialiseArgument(args);
+
+            /* COMMANDS */
+
+            // clear
+            if (!strcmp(args[0], "clr"))
+            {
+                  clr();
+                  {
+                        *retFlag = 3;
+                        return;
+                  };
+            }
+
+            // exit
+            if (!strcmp(args[0], "exit"))
+            {
+                  exit(0);
+            }
+
+            // dir
+            if (!strcmp(args[0], "dir"))
+            {
+                  dir(catArgs);
+                  free(catArgs);
+                  {
+                        *retFlag = 3;
+                        return;
+                  };
+            }
+
+            // echo
+            if (!strcmp(args[0], "echo"))
+            {
+                  echo(catArgs);
+                  free(catArgs);
+                  {
+                        *retFlag = 3;
+                        return;
+                  };
+            }
+
+            // cd
+            if (!strcmp(args[0], "cd"))
+            {
+                  cd(catArgs);
+                  getcwd(cwd, sizeof(cwd));
+                  free(catArgs);
+                  {
+                        *retFlag = 3;
+                        return;
+                  };
+            }
+
+            // environ
+            if (!strcmp(args[0], "environ"))
+            {
+                  environGet();
+                  {
+                        *retFlag = 3;
+                        return;
+                  };
+            }
+
+            // script
+            if (!strcmp(args[0], "script"))
+            {
+                  int res = fileProcessor(args[1]);
+                  free(catArgs);
+                  if (res == -1) {printf("Invalid Script\n"); *retFlag = 3; return;} else
+                  {*retFlag = 3; return;}
+            }
+
+            // if not explicitly stated
+            printf("%s: %s, Command Not Found.\n", shellShort, args[0]);
+
+            /* END OF COMMANDS */
+      }
+}
+
+/// @brief Executes commands from a given file 
+/// @param fileName file which is to be run
+/// @return -1 if the file is invalid
+int fileProcessor(char *fileName){
+
+    // open the file
+    FILE* fptr = fopen(fileName, "r");
+
+    // declare the same things we do in main()
+    char buf[MAX_BUBBER];
+    char* args[MAX_ARGS];
+    char** arg;
+
+    // check if file opened successfully
+    if (fptr == NULL) {return -1;}
+
+    // read in each line and tokenise
+    while(fgets(buf, MAX_BUBBER, fptr)) {
+      
+      arg = args;
+      *arg++ = strtok(buf, SEPARATORS); 
+
+      while ((*arg++ = strtok(NULL,SEPARATORS)));
+
+      // execute the command
+      int retFlag;
+      commandParser(args, &retFlag);
+      if (retFlag == 3) {continue;}
+    }
+    
+    fclose(fptr);
+
+    return 0;
 }

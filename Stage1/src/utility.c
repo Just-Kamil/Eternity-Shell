@@ -1,14 +1,7 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
-#include <linux/limits.h>
-
 #include "utility.h"
 extern char **environ;
-char cwd[PATH_MAX];
 
+char cwd[PATH_MAX];
 
 
 // COMMANDS //
@@ -39,7 +32,7 @@ int dir(char* arguments) {
   }
 
   // expand the memory based on the size of the given command
-  command = realloc(command, sizeof(char) * 3 +  sizeof(char) * strlen(arguments));
+  command = realloc(command, sizeof(char) * 3 +  sizeof(char) * strlen(arguments) + 1);
 
   // join the arguments together
   strcat(command, arguments);
@@ -87,8 +80,8 @@ int cd(char* arguments) {
     getcwd(cwd, sizeof(cwd));
     char* envPre = "PWD=";
 
-    // allocate mem
-    char* envVar = calloc(strlen(envPre) + strlen(cwd), sizeof(char));
+    // allocate mem, +2 for terminating char adj
+    char* envVar = calloc(strlen(envPre) + strlen(cwd) + 2, sizeof(char));
 
     // join strings
     envVar = strcat(envVar, envPre);
@@ -174,7 +167,10 @@ char* serialiseArgument(char** args) {
 
         // reallocate memory and concatenate the string until the args run out
         while(*arg != NULL) {
-          catArgs = realloc(catArgs, sizeof(char) * strlen(catArgs) + sizeof(char) * strlen(*arg));
+          // needed to add 2 to the end of realloc,
+          // to accommodate the fact the strlen() doesn't count the terminating char
+          // which would cause the program to write memory where it shouldn't and it would make fclose() sad :(
+          catArgs = realloc(catArgs, sizeof(char) * strlen(catArgs) + sizeof(char) * strlen(*arg) + 2);
           sprintf(catArgs,"%s %s", catArgs, *arg++);
         }
       
