@@ -8,6 +8,7 @@
 
 // char cwd[PATH_MAX];
 char* shellShort = "etsh";
+char runDir[PATH_MAX];
 void commandParser(char *args[64], int* retFlag);
 int fileProcessor(char* fileName);
 
@@ -33,6 +34,9 @@ int main(int argc, char *argv[]){
   extern char cwd[PATH_MAX];
 
   getcwd(cwd, sizeof(cwd));
+  
+  // records where the program was run from, this is done to keep track of the manual files
+  strcpy(runDir, cwd);
 
 
   // sets batch mode
@@ -51,7 +55,7 @@ int main(int argc, char *argv[]){
   setEnvironShell(argv[0]);
 
   // execute a .etshrc if one exists in the running dir
-  fileProcessor(".etshrc");
+   fileProcessor(".etshrc");
 
   
   while (!feof(stdin)) {
@@ -172,6 +176,17 @@ void commandParser(char *args[64], int* retFlag){
                         *retFlag = 3;
                         return;
                   };
+            }
+
+            // help
+            if (!strcmp(args[0], "help"))
+            {
+                  help(catArgs, runDir);
+                  free(catArgs);
+                  {
+                        *retFlag = 3;
+                        return;
+                  }
             }
 
             // if not explicitly stated

@@ -79,17 +79,9 @@ int cd(char* arguments) {
 
     // set env var of PWD to new dir
     getcwd(cwd, sizeof(cwd));
-    char* envPre = "PWD=";
 
-    // allocate mem, +2 for terminating char adj
-    char* envVar = calloc(strlen(envPre) + strlen(cwd) + 2, sizeof(char));
-
-    // join strings
-    envVar = strcat(envVar, envPre);
-    envVar = strcat(envVar, cwd);
-    
-    // set var
-    putenv(envVar);
+    // set the env var to the now current dir
+    setenv("PWD", cwd, 1);
 
     return 0;
   } else { // some error occurred
@@ -135,7 +127,9 @@ int cd(char* arguments) {
   return 0;
 }
 
-int help() {
+
+int help(char* arguments, char* runDir) {
+  if (!strlen(arguments)) {system("more ../manual/help.txt"); return 0;}
   return 0;
 }
 
@@ -213,33 +207,19 @@ char* serialiseArgument(char** args) {
 /// @return 0 upon success
 int setEnvironShell(char* programArg) {
 
-  // build the string
+  // this function used to be really long, then I discovered /proc/self/exe
+  // now it's 4 lines of code
+  // so, shoutouts to /proc/self/exe
 
-  // the current directory as a string
-  getcwd(cwd, sizeof(cwd));
+  // create a var to store the path from readlink
+  char buff[PATH_MAX];
 
-  // prefix for putenv
-  char* expArg = "SHELL=";
-
-  // i hate this
-  // WHY IS IT AN INT????? WHY? THERE IS LITERALLY A CHAR TYPE IN C, JUST USE THAT
-  
-  // name of the shell 
-  char* progName = strrchr(programArg, 47);
-
-  // allocate enough memory for the final string
-  char* finalExport = calloc(strlen(cwd) + strlen(expArg) + strlen(progName) + 3, sizeof(char));
-
-  // concatenate the strings
-  finalExport = strcat(finalExport, expArg);
-  finalExport = strcat(finalExport, cwd);
-  finalExport = strcat(finalExport, progName);
+  // /proc/self/exe is a symlink to whatever application is running
+  // so we take the resolve from that and put it into buff
+  readlink("/proc/self/exe", buff, sizeof(buff));
 
   // set the env var
-  putenv(finalExport);
-
-  // DO NOT free memory taken up by finalExport, environ uses that var
-  // free(finalExport);
+  setenv("SHELL", buff, 1);
 
   return 0;
 }
