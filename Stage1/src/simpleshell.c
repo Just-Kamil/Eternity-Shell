@@ -8,7 +8,6 @@
 
 // char cwd[PATH_MAX];
 char* shellShort = "etsh";
-char runDir[PATH_MAX];
 void commandParser(char *args[64], int* retFlag);
 int fileProcessor(char* fileName);
 
@@ -18,7 +17,7 @@ int fileProcessor(char* fileName);
 // [ ] make manual
 // [ ] make makefile
 // [ ] implement help
-// [ ] implement pause
+// [x] implement pause
 // [x] add the cwd to the prompt
 
 // *SPECIAL* TODO
@@ -33,11 +32,8 @@ int main(int argc, char *argv[]){
   char * prompt = "\x1b[42m↳\x1b[0m\x1b[32m\x1b[1m֍ ⇝ \x1b[0m";
   extern char cwd[PATH_MAX];
 
+  // sets currently working dir var for use later
   getcwd(cwd, sizeof(cwd));
-  
-  // records where the program was run from, this is done to keep track of the manual files
-  strcpy(runDir, cwd);
-
 
   // sets batch mode
   if (argv[1] != NULL) {
@@ -164,8 +160,11 @@ void commandParser(char *args[64], int* retFlag){
             {
                   int res = fileProcessor(args[1]);
                   free(catArgs);
-                  if (res == -1) {printf("Invalid Script\n"); *retFlag = 3; return;} else
-                  {*retFlag = 3; return;}
+                  if (res == -1) {printf("Invalid Script\n");}
+                  {
+                        *retFlag = 3; 
+                        return;
+                  };
             }
 
             // pause
@@ -181,7 +180,7 @@ void commandParser(char *args[64], int* retFlag){
             // help
             if (!strcmp(args[0], "help"))
             {
-                  help(catArgs, runDir);
+                  help(catArgs);
                   free(catArgs);
                   {
                         *retFlag = 3;

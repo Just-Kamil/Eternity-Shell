@@ -1,0 +1,30 @@
+                                               ,,                   
+`7MM"""YMM  mm                                 db   mm              
+  MM    `7  MM                                      MM              
+  MM   d  mmMMmm .gP"Ya `7Mb,od8 `7MMpMMMb.  `7MM mmMMmm `7M'   `MF'
+  MMmmMM    MM  ,M'   Yb  MM' "'   MM    MM    MM   MM     VA   ,V  
+  MM   Y  , MM  8M""""""  MM       MM    MM    MM   MM      VA ,V   
+  MM     ,M MM  YM.    ,  MM       MM    MM    MM   MM       VVV    
+.JMMmmmmMMM `Mbmo`Mbmmd'.JMML.   .JMML  JMML..JMML. `Mbmo    ,V     
+                                                            ,V      
+                                                         OOb"       
+                                         
+            ,,                 ,,    ,,  
+ .M"""bgd `7MM               `7MM  `7MM  
+,MI    "Y   MM                 MM    MM  
+`MMb.       MMpMMMb.  .gP"Ya   MM    MM  
+  `YMMNq.   MM    MM ,M'   Yb  MM    MM  
+.     `MM   MM    MM 8M""""""  MM    MM  
+Mb     dM   MM    MM YM.    ,  MM    MM  
+P"Ybmmd"  .JMML  JMML.`Mbmmd'.JMML..JMML. (aka "simpleshell")
+
+a shell made by Kamil Kasza.
+
+
+Why is it called "Eternity Shell" and "simpleshell"?
+  the assignment requires the program name to be called "simpleshell", but I wanted to call it "Eternity Shell" after I found the unicode symbol for "Eternity" and decided to use it as the prompt symbol.
+  There are areas where the name *has* to be "simpleshell" but its true name will always be "Eternity Shell".
+
+No AI was used in the writing of this code, I don't like genAI and therefore don't like using it. It was much more fun to code everything and fix the bugs myself.
+
+Also anything extra that is done here isn't me trying to "show off" my "programming skills", I just did it because I thought it was cool and or fun

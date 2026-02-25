@@ -12,7 +12,7 @@
 int clr();
 int environGet();
 int sysPause();
-int help(char* arguments, char* runDir);
+int help(char* arguments);
 int cd(char* arguments);
 int dir(char* arguments);
 int echo(char* arguments);

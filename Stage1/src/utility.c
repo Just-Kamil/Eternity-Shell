@@ -127,9 +127,67 @@ int cd(char* arguments) {
   return 0;
 }
 
+/// @brief Displays help information from a file using the 'more' command
+/// @param arguments a topic that the user wants more info on 
+/// @return 0 when completed
+int help(char* arguments) {
 
-int help(char* arguments, char* runDir) {
-  if (!strlen(arguments)) {system("more ../manual/help.txt"); return 0;}
+  // ok so, I decided that the manual is going to be copied and placed into whatever dir the script will be running from
+  // this is reflected in the make file
+  // I did this so that the program can be compiled and somewhat moved around.
+
+  char progPath[PATH_MAX];
+
+  // have to clear the string to remove garbage data that may interfere with setting the path
+  memset(progPath, 0, sizeof(progPath));
+
+  // get the path of the shell
+  readlink("/proc/self/exe", progPath, sizeof(progPath));
+
+
+  // the position of the last slash
+  char* lastSlash = strrchr(progPath, '/');
+
+  // add an end of string char after the slash
+  *lastSlash++ = '\0';
+
+  // if help is just run on its own
+  if (!strlen(arguments)) {
+    // PATH/man/readme.txt
+    char* command = calloc(strlen("more /man/readme.txt") + strlen(progPath) + 2, sizeof(char));
+    sprintf(command, "more %s/man/readme.txt", progPath);
+
+    system(command);
+    free(command);
+    return 0;
+  }
+
+  // specific about
+
+  // PATH/man/{arguments}.txt
+
+  // move arguments by one to adj for whitespace
+  *arguments++;
+
+  // the string that will be used to check if the help article exists
+  char* file = calloc(strlen("/man/.txt") + strlen(progPath) + strlen(arguments) + 3, sizeof(char));
+  sprintf(file,"%s/man/%s.txt", progPath, arguments);
+  
+  if (access(file, F_OK) == 0) {
+  // the command that will be run with system
+  char* command = calloc(strlen("more ") + strlen(file) + 2, sizeof(char));
+  sprintf(command, "more %s", file);
+
+  system(command);
+
+  free(command);
+  free(file);
+
+  } else {
+    printf("no help article found for %s\n", arguments);
+    free(file);
+  }
+
   return 0;
 }
 
