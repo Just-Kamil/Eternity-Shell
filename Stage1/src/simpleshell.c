@@ -14,9 +14,9 @@ int fileProcessor(char* fileName);
 
 // TODO
 // [x] make batch mode
-// [ ] make manual
-// [ ] make makefile
-// [ ] implement help
+// [x] make manual
+// [x] make makefile
+// [x] implement help
 // [x] implement pause
 // [x] add the cwd to the prompt
 
@@ -50,8 +50,15 @@ int main(int argc, char *argv[]){
   // change shell envVar
   setEnvironShell(argv[0]);
 
-  // execute a .etshrc if one exists in the running dir
-   fileProcessor(".etshrc");
+
+  // execute a .etshrc if one exists in the homedir
+  char* home = getenv("HOME");
+
+  char* homeRC = calloc(strlen(home) + strlen("/.etshrc") + 2, sizeof(char));
+  sprintf(homeRC, "%s/.etshrc", home);
+
+  fileProcessor(homeRC);
+  free(homeRC);
 
   
   while (!feof(stdin)) {
