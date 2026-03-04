@@ -1,18 +1,47 @@
-# CSC1021 Operating Systems: customshell
+```
 
-## Introduction
+                                               ,,                   
+`7MM"""YMM  mm                                 db   mm              
+  MM    `7  MM                                      MM              
+  MM   d  mmMMmm .gP"Ya `7Mb,od8 `7MMpMMMb.  `7MM mmMMmm `7M'   `MF'
+  MMmmMM    MM  ,M'   Yb  MM' "'   MM    MM    MM   MM     VA   ,V  
+  MM   Y  , MM  8M""""""  MM       MM    MM    MM   MM      VA ,V   
+  MM     ,M MM  YM.    ,  MM       MM    MM    MM   MM       VVV    
+.JMMmmmmMMM `Mbmo`Mbmmd'.JMML.   .JMML  JMML..JMML. `Mbmo    ,V     
+                                                            ,V      
+                                                         OOb"       
+                                         
+            ,,                 ,,    ,,  
+ .M"""bgd `7MM               `7MM  `7MM  
+,MI    "Y   MM                 MM    MM  
+`MMb.       MMpMMMb.  .gP"Ya   MM    MM  
+  `YMMNq.   MM    MM ,M'   Yb  MM    MM  
+.     `MM   MM    MM 8M""""""  MM    MM  
+Mb     dM   MM    MM YM.    ,  MM    MM  
+P"Ybmmd"  .JMML  JMML.`Mbmmd'.JMML..JMML. (aka "simpleshell")
 
-This is the starter repository for the _CSC1021 Operating Systems_ project entitled `customshell` and which you must complete individually. https://loop.dcu.ie/mod/assign/view.php?id=2869985
+```
 
-## What you need to do
+a shell made by Kamil Kasza.
 
-You should follow the instructions below:
+##### Why is it called "Eternity Shell" and "simpleshell"?
+  the assignment requires the program name to be called "simpleshell", but I wanted to call it "Eternity Shell" after I found the unicode symbol for "Eternity" and decided to use it as the prompt symbol.
+  There are areas where the name *has* to be "simpleshell" but its true name will always be "Eternity Shell".
 
-1. fork (do not clone) this repository.  Once you have forked it, make your own repository private add me (Graham Healy - @healygr) as "maintainer". You must do both of these steps before adding any deliverables. Maintainer: Manage -> Members -> Invite members -> search for and select @healygr -> set Select Maximum role to maintainer -> click Invite; Private: Settings -> General -> Visibility, project features, permissions -> Project visibility = private.
-2. There are 3 folders (Stage1, Stage2, and Stage3), and within Stage1 and Stage2 there are `src`, `manual`, `bin` directories.
-3. Add your files relating to the manual/help command to the `manual` directory.
-4. Your `makefile` should build the binary and place it in the `bin` directory.
-5. For Stage3, you should only add a file named video.txt containing the link to your video submission. This folder should only contain this single file.
+No AI was used in the writing of this code, I don't like genAI and therefore don't like using it. It was much more fun to code everything and fix the bugs myself.
 
-## Other notes
-There are supporting exercises to help you with the project.  You will find them all under  [Lab04/05 on the Loop CSC1021 Site](https://loop.dcu.ie/mod/book/view.php?id=2862651). 
+Also anything extra that is done here isn't me trying to "show off" my "programming skills", I just did it because I thought it was cool and or fun
+
+#### "Installing"
+While you can't directly install Eternity Shell, you can build it and run it
+
+to build it, navigate  the `src` folder in one of the `stage` folders found in the root of the project.
+
+Once inside run `make` and then navigate to the `bin` folder, run the program and you're in, you can now enjoy the bare-bones experience of Eternity Shell!
+
+#### Help
+
+For a list of commands and more detailed help, run the `help` command while running the shell. Alternatively, you can navigate to the `manual` folder found in one of the `stage` folders.
+
+#### .etshrc
+you can define a set of commands that run at startup by placing a file named ".etshrc" in your home directory.
