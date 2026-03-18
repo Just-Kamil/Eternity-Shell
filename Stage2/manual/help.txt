@@ -1,0 +1,11 @@
+⡄⠀⠀⠀⠀⠀⠠⡄⠀⠀⠀⠀⠀⠀⠀
+⡏⠉⡆⡮⠭⠆⠀⡇⠀⡏⠉⡆⠀⠀⠀
+⠃⠀⠃⠑⠒⠂⠀⠑⠂⡗⠒⠁⠀⠃⠀
+Shows general help information of information on a specific topic
+
+
+Usage:
+
+    help [TOPIC]
+
+shows general help information when run without an argument, otherwise shows a help page on a given topic if one exists

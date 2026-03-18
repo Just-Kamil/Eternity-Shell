@@ -1,0 +1,9 @@
+⠀⠀⠀⠠⡄⠀⠀⠀⠀⠀⠀⠀
+⡎⠉⠂⠀⡇⠀⡗⠉⠁⠀⠀⠀
+⠑⠒⠁⠀⠑⠂⠃⠀⠀⠀⠃⠀
+
+clears the screen of any text apart from the prompt
+
+Usage:
+
+    clr

@@ -1,0 +1,10 @@
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⡮⠭⠆⡏⠉⡆⢣⢠⠃⠈⡇⠀⡗⠉⠁⡎⠉⡆⡏⠉⡆⠀⠀⠀
+⠑⠒⠂⠃⠀⠃⠀⠃⠀⠐⠓⠀⠃⠀⠀⠑⠒⠁⠃⠀⠃⠀⠃⠀
+lists all the environment variables
+
+Usage:
+
+    environ
+
+Lists all the names and values of every currently set environment variable.

@@ -1,0 +1,10 @@
+⠀⠀⠀⠀⠀⠀⠀⠆⠀⠀⡄⠀⠀⠀⠀
+⡎⠉⡇⡇⠀⡇⠈⡇⠀⠈⡏⠀⠀⠀⠀
+⠑⠒⡇⠑⠒⠃⠐⠓⠀⠀⠑⠂⠀⠃⠀
+Exits the shell
+
+Usage:
+
+    exit
+
+Exits the shell with an exit code of 0.

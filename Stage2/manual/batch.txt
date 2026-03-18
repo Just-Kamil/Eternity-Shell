@@ -1,0 +1,31 @@
+⡤⠤⡀⠀⠀⠀⠀⡄⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀ ⡤⠤⠄⠀⠆⠀⠠⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⡗⠒⡅⡨⠭⡆⠈⡏⠀⡎⠉⠂⡏⠉⡆⠀⠀⠀ ⡗⠒⠀⠈⡇⠀⠀⡇⠀⡮⠭⠆⠪⠭⡁⠀⠀⠀
+⠓⠒⠁⠑⠒⠃⠀⠑⠂⠑⠒⠁⠃⠀⠃⠀⠀⠀ ⠃⠀⠀⠐⠓⠀⠀⠑⠂⠑⠒⠂⠒⠒⠁⠀⠃⠀
+
+you can run a list of commands by creating a "batch" script.
+
+all you have to do is run the shell with a path to the script as an argument or run "script". (See "Commands" under "help")
+
+    $ etsh /path/to/script.etsh
+
+    or
+
+    $ simpleshell /path/to/script
+
+the preferred extension is .etsh, although any text file should work.
+
+Here's an example of a batch script:
+
+    echo hello world!
+    cd /home/Kamil
+    echo Changed Dir!
+    cd
+
+Here's the expected output:
+
+    hello world!
+    Changed Dir!
+    /home/Kamil
+
+you can run other batch scripts using the "script" command although be careful if calling the same file that's running,
+you may fall into an infinite recursive loop
