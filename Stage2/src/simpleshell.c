@@ -25,6 +25,12 @@ int main(int argc, char *argv[]){
   char * prompt = "\x1b[42m↳\x1b[0m\x1b[32m\x1b[1m֍ ⇝ \x1b[0m";
   extern char cwd[PATH_MAX];
 
+  // store a copy of stdout so that we can return to it after a redirect
+  int savedStdout = dup(1);
+
+  // store a copy of stdin so that we can return to it after a redirect
+  int savedStdin = dup(0);
+
   // sets currently working dir var for use later
   getcwd(cwd, sizeof(cwd));
 
@@ -55,6 +61,12 @@ int main(int argc, char *argv[]){
 
   
   while (!feof(stdin)) {
+
+    // set the output to stdout incase it has been changed
+    dup2(savedStdout, 1);
+
+    // same for stdin
+    dup2(savedStdin, 0);
 
     printf("\x1b[37m\x1b[42m %s \x1b[0m\n", cwd);
     fputs(prompt, stdout);
@@ -92,6 +104,9 @@ void commandParser(char *args[64], int* retFlag){
       {
 
             char *catArgs = serialiseArgument(args);
+
+            // if an error occurs when parsing the arguments, just return
+            if (catArgs == NULL) return;
 
             /* COMMANDS */
 

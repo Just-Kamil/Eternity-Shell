@@ -22,7 +22,12 @@ extern char cwd[PATH_MAX];
 char* serialiseArgument(char** args);
 int setEnvironShell(char* programArg);
 
+int handleRedirect(char** args);
+int replaceIn(char* filePath);
+int replaceOut(char* filePath, int mode, int create);
+char** checkRedirect(char** args);
 char* lastString(char* stringArray[]);
 int stringArrayLength(char* stringArray[]);
+
 
 #endif // UTILITY_H_

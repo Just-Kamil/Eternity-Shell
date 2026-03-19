@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 extern char **environ;
+extern FILE* curOut;
 
 char cwd[PATH_MAX];
 
@@ -52,7 +53,7 @@ int dir(char* arguments) {
 /// @param arguments message to print
 /// @return 0 if program exits successfully
 int echo(char* arguments) {
-  printf("%s\n", arguments);
+  printf( "%s\n", arguments);
   return 0;
 }
 
@@ -148,7 +149,6 @@ int help(char* arguments) {
   // get the path of the shell
   readlink("/proc/self/exe", progPath, sizeof(progPath));
 
-
   // the position of the last slash
   char* lastSlash = strrchr(progPath, '/');
 
@@ -236,7 +236,6 @@ int forkExec(char* arguments[]) {
   int status;
   int bg_flag;
 
-
   // find the last arg in arguments
   char* lastArg = lastString(arguments);
 
@@ -264,31 +263,74 @@ int forkExec(char* arguments[]) {
       // find the length of arguments
       int argc = stringArrayLength(arguments);
 
-
       // create a new array to store the commands
       char* newArgs[64];
-
 
       // copy items up until &
       memcpy(newArgs, arguments, (argc - 1) * sizeof(char*));
 
+      // set the last arg to NULL so that execvp doesn't throw a fit
       newArgs[argc - 1] = NULL;
 
-
+      // this basically sends stdout to the ether, done so apps in the bg don't show in the terminal
       int file_null = open("/dev/null", O_WRONLY | O_APPEND);
 
+      // 1 is stdout, so we replace it with /dev/null
       dup2(file_null, 1);
 
+      // execute the command
       execvp(newArgs[0], newArgs);
 
-      printf("something is wrong\n %d", errno);
+      close(file_null);
+
+      // if this executes *something* went wrong, write the error
+      // stderr is not replaced so the user will be able to see it
+      fprintf(stderr, "Command was unable to run, errno: %d \n", errno);
+      exit(errno);
 
     } else {
 
+      // we don't reed to actually handle the redirects because serialiseArguments already does that
+      // check if there are any redirect symbols
+      char** redirectPos = checkRedirect(arguments);
+
+      // there is a redirect, truncate the inputs to before the symbol
+      if (redirectPos != NULL) {
+        // get the length of arguments
+        int argc = stringArrayLength(arguments);
+
+        // find the length of the array from the returned pointer
+        int neoArgc = stringArrayLength(redirectPos);
+
+        // the position that we want to copy until is the difference between the arg counts
+        int symPos = argc - neoArgc;
+
+
+        // variable to store new args
+        char* newArgs[64];
+
+        // copy the args over up until the symbol
+        memcpy(newArgs, arguments, symPos * sizeof(char*));
+
+        // add a null at the end to keep execvp happy
+        newArgs[symPos + 1] = NULL;
+
+
+        // execute the comand
+        execvp(newArgs[0], newArgs);
+
+        // something wrong, send error
+        fprintf(stderr, "Command was unable to run, errno: %d \n", errno);
+        //exit(errno);
+
+      } else {
       // arguments needs to be an array of strings, it also MUST terminate with NULL
-      // I'm not using execl because I am not an oracle, idk how many arguments there will be
-      printf("life is pain.\n");
-      execvp(arguments[0], arguments);
+      execvp(arguments[0], arguments); 
+      fprintf(stderr, "Command was unable to run, errno: %d \n", errno);
+
+      // exit so that we don't stay in the fork
+      exit(errno);
+      }
 
     }
 
@@ -316,29 +358,39 @@ int forkExec(char* arguments[]) {
 /// @return a string of all passed arguments with spaces separating them
 char* serialiseArgument(char** args) {
 
-        // reset pointer
-       char** arg = args;
+  // reset pointer
+  char** arg = args;
 
-        // adjust for command
-        *arg++;
+  // adjust for command
+  *arg++;
 
-        // check if there are arguments at all
-        // if not, return *some* kind of pointer so that free can be used later
-        if (*arg == NULL) {return calloc(0, sizeof(char));}
+  // check if there are arguments at all
+  // if not, return *some* kind of pointer so that free can be used later
+  if (*arg == NULL) {return calloc(0, sizeof(char));}
 
-        // aggregate all the arguments
-        char* catArgs = calloc(strlen(*arg), sizeof(char));
+  // check for redirection
+  char** redirSym = checkRedirect(args);
 
-        // reallocate memory and concatenate the string until the args run out
-        while(*arg != NULL) {
-          // needed to add 2 to the end of realloc,
-          // to accommodate the fact the strlen() doesn't count the terminating char
-          // which would cause the program to write memory where it shouldn't and it would make fclose() sad :(
-          catArgs = realloc(catArgs, sizeof(char) * strlen(catArgs) + sizeof(char) * strlen(*arg) + 2);
-          sprintf(catArgs,"%s %s", catArgs, *arg++);
-        }
-      
-      return catArgs;
+  // if there are redirect arguments, handle them and handle any errors that could occur
+  if (redirSym != NULL) if(handleRedirect(args) == -1) {fprintf(stderr, "etsh: Unable to preform redirection, errno: %d\n", errno); return NULL;}
+
+  // aggregate all the arguments
+  char* catArgs = calloc(strlen(*arg), sizeof(char));
+
+  // reallocate memory and concatenate the string until the args run out
+  while(*arg != NULL) {
+
+    // check if we need to stop at redirSym
+    if (redirSym != NULL && *redirSym == *arg) {break;}
+
+    // needed to add 2 to the end of realloc,
+    // to accommodate the fact the strlen() doesn't count the terminating char
+    // which would cause the program to write memory where it shouldn't and it would make fclose() sad :(
+    catArgs = realloc(catArgs, sizeof(char) * strlen(catArgs) + sizeof(char) * strlen(*arg) + 2);
+    sprintf(catArgs,"%s %s", catArgs, *arg++);
+  }
+
+return catArgs;
 
 }
 
@@ -364,10 +416,180 @@ int setEnvironShell(char* programArg) {
   return 0;
 }
 
-
 // END OF SIMPLESHELL UTILS //
 
 // OTHER UTILS //
+
+/// @brief returns a pointer to the first instance of a redirect symbol
+/// @param args an array of strings that consists of the arguments given
+/// @return pointer to the first instance of a redirect symbol or NULL
+char** checkRedirect(char** args) {
+  // move through all of the arguments, find the first instance of either > < or >> then return a pointer to there
+
+  // set the moving pointer
+  char** arg = args;
+
+  while (*arg != NULL) {
+    // don't need to check for >> because no actual redirection is happening here
+    if (*arg[0] == '>' || *arg[0] == '<') {return arg;}
+
+    // move to next item
+    *arg++;
+  }
+
+  // if there is no redirect, return NULL
+  return NULL;
+}
+
+
+/// @brief replaces stdout with given file 
+/// @param filePath file to replace stdout with
+/// @param mode when set to 0, truncates. when set to 1 appends
+/// @return retuns 0 upon success -1 on fail
+int replaceOut(char* filePath, int mode, int create) {
+
+  // default is set to truncate and write
+  int oflags = O_WRONLY | O_TRUNC;
+
+  // if the mode is 1 or higher, append
+  if (mode) oflags = O_WRONLY | O_APPEND;
+
+  // if the create flag is set, OR the flags with the create flag
+  if (create)oflags =  oflags | O_CREAT;
+
+  // open the file we will replace stdout with
+  // when creating a file set the perms to -rw-r--r-- (0644) which is the default for files I think
+  int file_redir = open(filePath, oflags, 0644);
+
+  // if open fails, return -1
+  if (file_redir == -1) return -1;
+
+  // replace stdout with the file
+  int status = dup2(file_redir, 1);
+
+  // if dup2 fails, return -1
+  if (status == -1) return -1;
+
+  // everything worked
+  return 0;
+
+}
+
+/// @brief replaces stdin with given file
+/// @param filePath file to replace stdin with
+/// @return returns 0 on success and -1 on failure
+int replaceIn(char* filePath) {
+
+  // open file
+  int file_redir = open(filePath, O_RDONLY);
+
+  // if open fails, return -1
+  if (file_redir == -1) return -1;
+
+  // replace stdin with file
+  int status = dup2(file_redir, 0);
+
+  // if dup2 fails, return -1
+  if (status == -1) return -1;
+
+  // if we got here everything is aok
+  return 0;
+}
+
+int handleRedirect(char** args) {
+  // check for all the symbols
+
+  // I don't like doing it this way, and there probably is a better way. but ;)
+  char** arg = args;
+
+  // variables for the symbols
+  char** gtSym = NULL;
+  char** dgtSym = NULL;
+  char** ltSym = NULL;
+
+  // check for > and >>
+
+  // traverse array looking for >
+  while(*arg != NULL && *arg[0] != '>') {*arg++;}
+  
+  // if something was found
+  if (*arg != NULL) {
+    // check for >>
+
+    // had to add an extra variable because pointers weren't working
+    char* foundString = *arg;
+    if (strlen(*arg) == 2 && foundString[1] == '>') dgtSym = arg;
+    else gtSym = arg;
+  }
+
+  // check for <
+  // reset pointer
+  arg = args;
+  while(*arg != NULL && *arg[0] != '<') {*arg++;}
+  if (*arg != NULL) ltSym = arg;
+
+  // change stdout as needed
+
+  // >
+  if (gtSym != NULL) {
+
+    // set set the flag to create
+    int createFile = 0;
+
+    // the filename will be *after* the symbol
+    char* filePath = *(gtSym  + 1);
+
+    // check if we can write to file, if not make one
+    if(access(filePath, W_OK) != 0) createFile = 1;
+
+    // replace stdout with the file
+    int status = replaceOut(filePath, 0, createFile);
+
+    // if something goes wrong return -1
+    if (status == -1) return -1;
+
+  }
+
+  // >>
+  if (dgtSym != NULL) {
+        // set set the flag to create
+    int createFile = 0;
+
+    // the filename will be *after* the symbol
+    char* filePath = *(dgtSym  + 1);
+
+    // check if we can write to file, if not; make one
+    if(access(filePath, W_OK) != 0) createFile = 1;
+
+    // replace stdout with the file
+    int status = replaceOut(filePath, 1, createFile);
+
+    // if something goes wrong return -1
+    if (status == -1) return -1;
+  }
+
+  // change stdin as needed
+
+  // <
+  if (ltSym != NULL) {
+
+    // the file argument
+    char* filePath = *(ltSym + 1);
+
+    // we need to be able to read the file
+    if(access(filePath, R_OK) != 0) return -1;
+
+    // replace stdin with our file
+    int status = replaceIn(filePath);
+    
+    // if something goes wrong return -1
+    if (status == -1) return -1;
+    
+  }
+
+  // if we get here, then everything should have worked
+  return 0;
+}
 
 /// @brief returns the last string in an array
 /// @param stringArray an array of strings
