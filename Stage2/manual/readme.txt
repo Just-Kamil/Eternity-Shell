@@ -20,6 +20,11 @@ Commands:
 
 if you want more information on any command type "help <command name>" 
 
+Other Commands:
+
+    you can run any program/command that can be found in your PATH variable or via a direct path to the file.
+    Just type the name of the command and hit enter.
+
 Batch files:
 
     you can run a list of commands by creating a "batch" script.
@@ -33,3 +38,32 @@ Batch files:
         $ simpleshell /path/to/script
     
     for more information run "help batch"
+
+I/O Redirection:
+
+    You can redirect input and output from/into files.
+
+    To redirect all output into a file:
+    [COMMAND] > [FILE]
+    This redirect creates a new file or overwrites a file with a given name.
+
+    [COMMAND] >> [FILE]
+    Same as previous redirect except it appends to the file.
+
+    To redirect all input from a file:
+    [COMMAND] < [FILE]
+    This redirect will read a file and send all of the input to the command
+
+    for more information run "help redirect"
+
+Background Execution:
+
+To run a non-built-in process in the background, add an ampersand to the end of the command:
+
+    [COMMAND] [ARGS] &
+
+To run the same process but quietly:
+
+    [COMMAND] [ARGS] &-
+
+for more information run "help background"

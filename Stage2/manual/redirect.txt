@@ -1,0 +1,26 @@
+⠠⡤⠀⠀⠀⡄⡠⠤⡀⠀⠀⠀ ⡤⠤⡀⠀⠀⠀⠀⠀⡄⠀⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀⠀⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⡇⠀⠀⡜⠀⡇⠀⡇⠀⠀⠀ ⡧⡤⠃⡮⠭⠆⡎⠉⡇⠈⡇⠀⡗⠉⠁⡮⠭⠆⡎⠉⠂⠈⡏⠀⠈⡇⠀⡎⠉⡆⡏⠉⡆⠀⠀⠀
+⠐⠓⠀⠘⠀⠀⠑⠒⠁⠀⠀⠀ ⠃⠈⠂⠑⠒⠂⠑⠒⠃⠐⠓⠀⠃⠀⠀⠑⠒⠂⠑⠒⠁⠀⠑⠂⠐⠓⠀⠑⠒⠁⠃⠀⠃⠀⠃
+
+Output Redirection:
+
+You can redirect output from a command away from stdout into a file, if the file does not exist one will be created.
+
+There are two ways to achieve this:
+
+    [COMMAND] > [FILE]
+
+    This method will overwrite (truncate) any file it's writing into.
+
+    [COMMAND] >> [FILE]
+
+    This method will append to any file it's writing into.
+
+
+Input Redirection:
+
+Just like redirecting stdout, you can redirect stdin.
+
+    [COMMAND] < [FILE]
+
+    this will send every line as an stdin input to the command.

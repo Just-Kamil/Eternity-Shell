@@ -1,0 +1,15 @@
+⡤⠤⡀⠀⠀⠀⠀⠀⠀⢠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀⠀⠀ ⡤⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀⠀⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⡗⠒⡅⡨⠭⡆⡎⠉⠂⢸⡔⠁⡎⠉⡇⡗⠉⠁⡎⠉⡆⡇⠀⡇⡏⠉⡆⡎⠉⡇⠀⠀⠀ ⡗⠒⠀⠑⡔⠁⡮⠭⠆⡎⠉⠂⡇⠀⡇⠈⡏⠀⠈⡇⠀⡎⠉⡆⡏⠉⡆⠀⠀⠀
+⠓⠒⠁⠑⠒⠃⠑⠒⠁⠘⠈⠂⢑⣒⠇⠃⠀⠀⠑⠒⠁⠑⠒⠃⠃⠀⠃⠑⠒⠃⠀⠀⠀ ⠓⠒⠂⠊⠈⠂⠑⠒⠂⠑⠒⠁⠑⠒⠃⠀⠑⠂⠐⠓⠀⠑⠒⠁⠃⠀⠃⠀⠃⠀
+
+You can run any non-built-in command/application in the background
+this means that you can execute other commands, your shell session is not replaced by the command
+
+to do this add an ampersand at the end of the command like so:
+
+    [COMMAND] &
+
+    This command will still print stdout into the running terminal session, meaning that output may be shown while you're writing other commands.
+    You can suppress these outputs by adding a hyphen after the ampersand:
+
+    [COMMAND] &-
