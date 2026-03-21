@@ -188,7 +188,7 @@ int help(char* arguments) {
   free(file);
 
   } else {
-    printf("no help article found for %s\n", arguments);
+    printf("no help article found for %s (Maybe try 'man'?)\n", arguments);
     free(file);
   }
 
@@ -272,16 +272,25 @@ int forkExec(char* arguments[]) {
       // set the last arg to NULL so that execvp doesn't throw a fit
       newArgs[argc - 1] = NULL;
 
+
+      // If the user adds a hyphen at the end, it will send all the input to /dev/null
+      if (strlen(lastArg) == 2 && lastArg[1] == '-') {
+
+      // side note:
+      // I genuinely thought that when you run an application in the background the output isn't printed into your terminal
+      // which is why this code here exists in the first place, and also took like an hour to implement :), which sounds ridiculous but is true :(
+      // but now you can suppress input if you want, which is kinda cool 
+
       // this basically sends stdout to the ether, done so apps in the bg don't show in the terminal
       int file_null = open("/dev/null", O_WRONLY | O_APPEND);
 
       // 1 is stdout, so we replace it with /dev/null
       dup2(file_null, 1);
+      
+      }
 
       // execute the command
       execvp(newArgs[0], newArgs);
-
-      close(file_null);
 
       // if this executes *something* went wrong, write the error
       // stderr is not replaced so the user will be able to see it
