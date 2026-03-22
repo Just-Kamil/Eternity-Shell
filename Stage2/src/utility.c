@@ -294,6 +294,8 @@ int forkExec(char* arguments[]) {
 
       // if this executes *something* went wrong, write the error
       // stderr is not replaced so the user will be able to see it
+      // errno 2 is a file not found error, which 99% of the time means the user used a command that didn't exist
+      if (errno == 2) {return errno;}
       fprintf(stderr, "Command was unable to run, errno: %d \n", errno);
       exit(errno);
 
@@ -329,12 +331,14 @@ int forkExec(char* arguments[]) {
         execvp(newArgs[0], newArgs);
 
         // something wrong, send error
+        if (errno == 2) {return errno;}
         fprintf(stderr, "Command was unable to run, errno: %d \n", errno);
         //exit(errno);
 
       } else {
       // arguments needs to be an array of strings, it also MUST terminate with NULL
       execvp(arguments[0], arguments); 
+      if (errno == 2) {return errno;}
       fprintf(stderr, "Command was unable to run, errno: %d \n", errno);
 
       // exit so that we don't stay in the fork
