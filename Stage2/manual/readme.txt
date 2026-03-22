@@ -67,3 +67,10 @@ To run the same process but quietly:
     [COMMAND] [ARGS] &-
 
 for more information run "help background"
+
+
+Environment variables
+  
+  etshell (simpleshell) changes two of your environment vairables:
+    1. SHELL - the variable that denotes which shell you're using, it gets changed to "simpleshell"
+    2. PWD - this environment variable denotes which directory you're currently working in, cd is the command that changes the variable to wherever you cd'd to
